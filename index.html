@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>전산팀 참고용 가이드</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        
+        img {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px; /* 이미지를 좀 더 깔끔하게 보이게 합니다 */
+        }
+    
+        /* 2. 풀 사이즈 이미지 (100% 너비) */
+        .full-size {
+            width: 100%;
+            max-width: 100%;
+        }
+    
+        /* 3. 하프 사이즈 이미지 (PC에선 50%, 모바일에선 100%) */
+        .half-size {
+            width: 100%;       /* 기본값 */
+            max-width: 50%;    /* PC에서는 최대 50%까지만 커짐 */
+        }
+    
+        /* 4. 모바일 대응 (화면이 좁을 때는 모두 100%로 보기 좋게) */
+        @media (max-width: 768px) {
+            .half-size {
+                max-width: 100% !important;
+            }
+        }
+        :root {
+            --bg-color: #0f1319;
+            --card-bg: #161d26;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --primary: #011b25;
+            --border-color: #2e3b4e;
+            --border-radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 20px; /* 고정된 사이드바 때문에 상단이 가려지는 것 방지 */
+        }
+        body {
+                background-color: #ffffff; 
+                /* 만약 글자가 안 보일 수 있으니 글자색도 명확하게 검은색으로 지정 */
+                
+                /* 본문이 너무 화면 끝에 붙지 않게 여백을 주는 것이 좋습니다 */
+                margin: 20px;
+
+                line-height: 1.7;        /* 줄 간격을 넓혀서 답답함 해소 */
+                letter-spacing: -0.02em; /* 한국어는 살짝 좁히면 더 예쁩니다 */
+                color: #334155;          /* 완전 검정(#000)보다 눈이 훨씬 편함 */
+            }
+                /* 1. 컨테이너 고정 및 리스트 초기화 */
+        .fixed-bottom-ui {
+            position: fixed !important;
+            /* 화면 세로 중앙 설정 */
+            top: 50% !important;
+            right: 20px !important;
+            /* 자신의 높이만큼 위로 올려 정확한 중앙 정렬 */
+            transform: translateY(-50%) !important;
+            z-index: 9999 !important;
+        }
+
+        .fixed-bottom-ui ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* 2. 아이템 사이 간격 제거 및 텍스트 기준 너비 설정 */
+        .fixed-bottom-ui li {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* 3. 버튼 및 텍스트 박스: 테두리 중심, 직각 스타일, 자동 너비 */
+        .fixed-bottom-ui button, 
+        .fixed-bottom-ui .update-date {
+            display: block;
+            width: 100%;             /* 부모 li 너비에 맞춤 */
+            min-width: 120px;        /* 너무 좁아지지 않게 최소 너비 설정 */
+            padding: 10px 15px;      /* 텍스트 좌우 여백 확보 */
+            background-color: #ffffff; /* 색상 통일 */
+            border: 1px solid #e2e8f0; /* 테두리만 */
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            text-align: center;
+            box-sizing: border-box;
+            border-radius: 0;        /* 둥글기 제거 */
+        }
+        .fixed-bottom-ui .update-date {
+            cursor: default !important; /* 이 한 줄이 핵심입니다 */
+        }
+
+        /* 4. 위쪽 테두리와 아래쪽 테두리가 겹치지 않게 조절 */
+        .fixed-bottom-ui li:not(:first-child) button,
+        .fixed-bottom-ui li:not(:first-child) .update-date {
+            border-top: none;
+        }
+
+
+
+                /* 목차 스타일 */
+                .toc-item {
+            color: #475569;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            display: block;
+            padding: 5px 5px 5px 10px; /* 여기서 고정된 패딩을 줍니다 */
+        }
+
+        /* 호버 시 색상만 변경 (padding은 건드리지 않음) */
+        .toc-item:hover {
+            color: #2563eb;
+        }
+        .toc-box {
+            /* 1. 기본 박스 스타일 */
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0; /* 은은한 회색 테두리 */
+            border-radius: 12px;       /* 둥근 모서리 */
+            padding: 20px;             /* 내부 여백 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* 아주 연한 그림자 */
+            min-width: 200px; /* 너무 좁아지지 않게 최소 너비 유지 */
+            max-width: 350px; /* 너무 커지지 않게 최대 너비 제한 (선택 사항) */
+        }
+
+        .toc-box h3 {
+            margin: 0 0 15px 0 !important;
+            font-size: 1.1rem;
+            color: #1e293b;
+            border-bottom: 2px solid #f1f5f9; /* 제목 아래 구분선 */
+            padding-bottom: 10px;
+        }
+
+        .toc-box ul {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .toc-box a {
+            /* 3. 텍스트가 강제로 줄바꿈되지 않게 설정 */
+            white-space: nowrap;
+            text-decoration: none;
+            color: #475569;
+            padding: 8px 12px 8px 20px;
+            display: block;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: none; /* 애니메이션 제거 */
+        }
+
+        /* 활성화 상태 (배경색 변경) */
+        .toc-box a.active {
+            background-color: #e2e8f0 !important;
+            color: #011b25 !important;
+            font-weight: bold !important;
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 10px;
+            background: #2f366e; /* 포인트 색상 */
+            z-index: 9999;
+        }
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* [사이드바] */
+        .sidebar {
+            width: 280px;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .toggle-btn {
+            background: #011b25; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 8px; margin-bottom: 10px; font-weight: bold;
+        }
+
+
+
+        /* [본문] */
+        .main-content { flex: 1; min-width: 0; }
+
+        h1.main-title {
+            font-size: 1.8rem;
+            color: #1e293b;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin: 50px 0 25px 0;
+        }
+
+        h2.sub-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        h3.section-header {
+            font-size: 1.15rem;
+            color: #1e293b;
+            margin: 25px 0 10px 0;
+            padding-left: 10px;
+            border-left: 3px solid var(--primary); /* 세련되게 포인트 색상으로 변경 추천 */
+        }
+        /* h4 스타일 추가 */
+        h4.sub-section-header {
+            font-size: 1.05rem;
+            color: #333333;
+            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        h4.sub-section-header::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary); /* 포인트 색상 */
+            border-radius: 50%;
+            margin-right: 8px; /* 글자와 점 사이 간격 */
+        }
+        .card {
+            background-color: #ffffff !important; /* 배경을 강제로 흰색으로 */
+            border: 1px solid #e0e0e0;            /* 테두리 색상도 밝게 조정 추천 */
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 그림자를 조금 연하게 하면 더 깔끔합니다 */
+            color: #333333 !important;
+        }
+        .section-container {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 16px 24px 24px 24px; /* 상단(첫번째 값)을 24px에서 16px로 슬림하게 조절 */
+            margin-bottom: 35px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        p {
+            margin-bottom: 12px;
+            color: #333333;
+            font-size: 15px;
+            word-break: keep-all;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .image-placeholder {
+            width: 100%;             /* 부모 요소 너비에 맞춤 */
+            height: 300px;           /* 원하는 높이 지정 */
+            background-color: #e2e8f0; /* 회색 배경 (임시 컬러) */
+            display: flex;
+            justify-content: center; /* 가로 중앙 정렬 */
+            align-items: center;     /* 세로 중앙 정렬 */
+            color: #64748b;          /* 텍스트 색상 */
+            font-weight: bold;
+            border: 2px dashed #cbd5e1; /* 점선 테두리로 '임시' 느낌 강조 */
+        }
+
+        /* 3. 표(Table) 배경 및 글자색 배경을 흰색으로, 글자를 검정으로 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: #ffffff; /* #1f2936(어두운색)에서 변경 */
+        }
+
+        th, td {
+            border: 1px solid #cccccc; /* 테두리를 조금 더 진하게 */
+            padding: 12px;
+            text-align: left;
+            color: #333333; /* #cbd5e1(밝은 회색)에서 변경 */
+        }
+
+        th {
+            background-color: #f8fafc; /* 밝은 회색 배경 */
+            color: #000000; /* 검정색 글자 */
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .life-skill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .life-skill-table th, .life-skill-table td {
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .life-skill-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: bold;
+        }
+        .life-skill-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+
+        .option-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+        }
+        .option-table th, .option-table td {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .option-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: bold;
+        }
+        .option-table .category {
+            font-weight: bold;
+            background-color: #f8fafc;
+            color: #2563eb;
+            width: 15%;
+        }
+        /* 제목과 버튼을 정렬하기 위한 상자 */
+        .main-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0 !important;     /* 💥 상단 여백을 강제로 0으로 만들어 뻥 뚫린 공백을 제거 */
+            margin-bottom: 20px;          /* 제목 아래 본문과의 간격만 유지 */
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        /* 기존 h1의 마진과 하단 선이 겹치지 않게 초기화 */
+        h1.main-title {
+            margin-top: 0 !important;      /* 상단 마진 제거 */
+            margin-bottom: 0 !important;   /* 하단 마진 제거 */
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+            line-height: 1.2;              /* 줄간격으로 인한 미세 여백 정돈 */
+        }
+
+        /* 밝은색 테마에 어울리는 깔끔하고 세련된 라운드 버튼 */
+        .toggle-layout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #475569;             /* 차분한 진회색 글자색 */
+            background-color: #ffffff;  /* 기본 흰색 배경 */
+            border: 1px solid #cbd5e1;  /* 연한 테두리 */
+            border-radius: 6px;         /* 깔끔한 각진 라운드 */
+            padding: 5px 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        /* 마우스를 올렸을 때 (Hover) */
+        .toggle-layout-btn:hover {
+            background-color: #f8fafc;  /* 아주 연한 회색 배경 */
+            color: #0f172a;             /* 글자색 강조 */
+            border-color: #94a3b8;      /* 테두리 약간 진하게 */
+        }
+
+        /* 접혀서 '펴기' 상태일 때의 스타일 (약간의 포인트 변화) */
+        .toggle-layout-btn.folded-state {
+            background-color: #f1f5f9;  /* 연한 회색 박스로 변경 */
+            color: #334155;
+            border-color: #cbd5e1;
+        }
+
+        /* 화살표 아이콘 모양 및 애니메이션 효과 */
+        .toggle-layout-btn::after {
+            font-size: 0.65rem;
+            display: inline-block;
+            transition: transform 0.15s ease;
+        }
+
+        .toggle-layout-btn.expanded-state::after {
+            content: "▲";
+        }
+
+        .toggle-layout-btn.folded-state::after {
+            content: "▼";
+        }
+
+        /* 접혔을 때 본문 카드를 숨겨주는 클래스 */
+        .content-folded {
+            display: none !important;
+        }
+
+                        /* [반응형] */
+        /* 화면 폭이 900px 이하인 모바일/태블릿 환경에서만 적용 */
+        @media (max-width: 900px) {
+            /* 1. 사이드바(목차) 영역을 완전히 숨김 */
+            .sidebar {
+                display: none !important;
+            }
+                .fixed-bottom-ui {
+                display: none !important;
+            }
+
+
+            
+            /* 2. 본문이 차지하는 불필요한 바깥 여백(여백 때문에 가로 스크롤 유발 방지) 초기화 */
+            body {
+                margin: 10px !important; /* 모바일 전용 슬림한 여백 */
+            }
+
+            /* 3. 본문 컨테이너가 화면 너비를 초과하지 않도록 제한 */
+            .page-wrapper, .main-content, .section-container, .card {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div class="page-wrapper">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div id="toc-content" class="toc-box">
+                <h3 style="margin-bottom: 15px;">목차</h3>
+                <ul style="list-style: none;">
+
+                    <li style="margin-bottom: 10px;">
+                        <a href="#section0" class="toc-item">0. 통합인증시스템</a>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section1" class="toc-item">1. NAC</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section2" class="toc-item">2. Epicor</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section3" class="toc-item">3. Cloudium</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section4" class="toc-item">4. 웹메일</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section5" class="toc-item">5. CRM</a>
+                        </li>
+                        
+                        <!--
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section6" class="toc-item">6. 골드 수급처</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section7" class="toc-item">7. 스펙업</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section8" class="toc-item">8. 내실</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="#section9" class="toc-item">9. 외부 사이트</a>
+                        </li>
+                        -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- 본문 -->
+        <main class="main-content">
+
+            <div class="section-container">
+                <h1 class="main-title" id="intro">가이드 소개</h1>
+                <div class="card">
+                    <!--
+                        <img alt="이미지 1" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/N84jld3qhj/2026_loaon_guide/main/images/0000.png" />
+                    -->
+                    <p>이 가이드는 대성산업 매뉴얼 및 쎌틱 내 매뉴얼을 활용하여 작성하였습니다.</p>
+                    <p>🖥️ 본 가이드는 데스크탑(PC) 환경에 최적화되어 제작되었습니다.</p>
+                    <p>본 가이드의 문장 및 문법 검토, 레이아웃 작성은 제미나이(Gemini)의 도움을 받았습니다.</p>
+                    <a href="https://gw.nleader.co.kr/groupware/layout/board_BoardList.do?CLSYS=board&CLMD=user&CLBIZ=Board&boardType=Total&menuID=10" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[대성산업 게시판] </a>
+                    <a href="https://celtic.daesung.co.kr/url/?key=0036z1PbG_w9uoVj" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[쎌틱 내부 매뉴얼]</a>
+                    <!-- <p>최종 수정일 2026. 06. 16</p> -->
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section0">0. 통합인증시스템</h1>
+                <div class="card">
+                    <h2 class="sub-title">0. 통합인증시스템 개요</h2>
+                    <p></p>
+                    <p>대성산업 내 다양한 시스템을 접근하여 사용할 수 있는 내부 시스템입니다.</p>
+                    <p>통합인증계정이 잠겼을 때, 해당 시스템의 비밀번호 찾기 기능을 통해 초기화가 가능합니다.(NAC도 동일합니다.)</p>
+                    <a href="https://bizmoaportal.daesung.co.kr" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[비즈모아포탈 바로가기]</a>
+                    <a href="https://sso.daesung.co.kr" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[통합인증시스템 바로가기]</a>
+                    <p></p>
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">1. 비즈모아포탈</h2>
+                    <h3 class="section-header">기기 등록</h3>
+                    <img alt="이미지 001" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img001.png" />
+                    <p>크로미움 기반의 브라우저 환경에서 사용할 수 있는 신규 시스템입니다.</p>
+                    <p>별도의 모바일 어플의 2차 인증을 통해 접근 가능합니다.</p>
+                    <p>먼저 아래의 링크를 통해서 모바일 어플을 다운로드합니다.</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.pentasecurity.isignpass.v2&pcampaignid=web_share" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[android 다운로드 페이지]</a>
+                    <a href="https://apps.apple.com/kr/app/isign-pass-v2/id6444204442" style="color: #3b82f6; text-decoration: underline; font-weight: bold;" target="_blank">[ios 다운로드 페이지]</a>
+                    <p>이제 비즈모아포탈 상에서 로그인을 진행합니다. </p>
+                    <p>입사자의 경우 ID, PW 모두 사번을 입력하고, 기존 임직원분들은 nleader 계정정보로 로그인합니다.</p>
+                    <img alt="이미지 002" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img002.png" />
+                    <p>모바일 어플로 QR코드를 스캔하여 2차 인증을 완료합니다.</p>
+                    <img alt="이미지 003" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img003.png" />
+                    <img alt="이미지 004" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img004.png" />
+                    <p>이후 로그인을 마저 진행하여 내부 시스템을 이용할 수 있습니다.</p>
+                    <img alt="이미지 005" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img005.png" />
+                    <p></p>
+
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">2. 구 통합인증페이지</h2>
+                    <p>Internet Explorer 기반의 브라우저 환경에서 사용할 수 있는 구 통합인증 시스템입니다.</p>
+                    <p>법무커뮤니티, 해강연수원 등의 active x 를 사용하는 페이지 접근 시 사용합니다.</p>
+
+                    <h3 class="section-header">인터넷 옵션 설정 변경</h3>
+                    <p>먼저 인터넷 옵션 설정을 진행합니다.</p>
+                    <img alt="이미지 012" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img012.png" />                    
+                    <img alt="이미지 013" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img013.png" />
+                    <img alt="이미지 014" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img014.png" /> 
+                    <p></p>
+
+                    <h3 class="section-header">Edge 설정변경</h3>
+                    <p>Microsoft Edge 설정을 변경하여 explorer 환경을 구성합니다.</p>
+                    <img alt="이미지 006" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img006.png" />                    
+                    <img alt="이미지 007" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img007.png" />
+                    <img alt="이미지 008" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img008.png" />                    
+                    <p>해당 설정을 추가하여 <strog>Explore mode</strog>로 페이지에 접근이 가능합니다.</p>
+                    <p>이후 <strong>Edge 설정가이드</strong> 를 통하여 통합인증프로그램 설치를 진행합니다.</p>
+                    <img alt="이미지 009" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img009.png" />                    
+                    <img alt="이미지 010" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img010.png" />
+                    <p>설치 후 마저 로그인을 진행하여 시스템을 이용할 수 있습니다.</p>
+                    <img alt="이미지 011" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img011.png" />
+                    <p></p> 
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section1">1. NAC</h1>
+                <div class="card">
+                    <p>회사에서 인터넷을 사용하기 위해서는 NAC 설치 및 로그인을 필수로 진행해야합니다.</p>
+                    <p>WIFI 목록 중 <strong>DS-CE-WORK</strong>를 선택합니다.</p>
+                    <p>PW : @ds8577!</p>
+                    <p>이후 브라우저에 접속하게 되면 NAC 설치 페이지에 접근하여 NAC설치할 수 있습니다.</p>
+                    <img alt="이미지 015" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img015.png" />
+                    <p>NAC 계정은 통합인증계정과 동일합니다.</p>
+                    <img alt="이미지 016" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img016.png" />
+                    <p>필수 SW 검사 및 백신 설치를 진행하여 무결성 검사를 완료합니다.</p>
+                    <img alt="이미지 017" class="full-size lazy-scroll-img" src="https://raw.githubusercontent.com/dudrb473/dudrb473.github.io/main/images/img017.png" />
+                    <p></p>
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section2">2. Epicor</h1>
+                <div class="card">
+
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section3">3. Cloudium</h1>
+                <div class="card">
+                    <h2 class="sub-title">쿠르잔 전선</h2>
+
+                    <h2 class="sub-title">가디언 토벌</h2>
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">에포나 의뢰</h2>
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">생활</h2>
+
+                    <h3 class="section-header">추천 생활 스킬</h3>
+
+                    <h3 class="section-header">요약</h3>
+                    <table class="life-skill-table">
+                        <thead>
+                            <tr>
+                                <th>생활</th>
+                                <th>생기 소모</th>
+                                <th>경쟁 정도</th>
+                                <th>핵심 특징</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>벌목</strong></td>
+                                <td>매우 빠름</td>
+                                <td>보통</td>
+                                <td>가장 많이하는 생활</td>
+                            </tr>
+                            <tr>
+                                <td><strong>고고학</strong></td>
+                                <td>빠름</td>
+                                <td>보통</td>
+                                <td>유물 키트 획득 가능</td>
+                            </tr>
+                            <tr>
+                                <td><strong>식물채집</strong></td>
+                                <td>보통</td>
+                                <td>낮음</td>
+                                <td>융화 재료보다는 물약 만드는데 사용</td>
+                            </tr>
+                            <tr>
+                                <td><strong>수렵</strong></td>
+                                <td>보통</td>
+                                <td>낮음</td>
+                                <td>요리 가격에 따라 재료값이 올라가기도 함</td>
+                            </tr>
+                            <tr>
+                                <td><strong>채광</strong></td>
+                                <td>보통</td>
+                                <td>낮음</td>
+                                <td>빛성폭 가격에 따라 재료값이 올라가기도 함</td>
+                            </tr>
+                            <tr>
+                                <td><strong>낚시</strong></td>
+                                <td>매우 느림</td>
+                                <td>없음</td>
+                                <td>수익 적음. 내실용으로만</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="section-header">재료 직접 판매 vs 영지 제작</h3>
+
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section4">4. 웹메일</h1>
+                <div class="card">
+                    <h2 class="sub-title">엔드 콘텐츠</h2>                    
+                    
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">낙원</h2>
+                    
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h1 class="main-title" id="section5">5. CRM</h1>
+                <div class="card">
+
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">섬</h2>
+                    
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">카오스게이트</h2>
+                    
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">필드 보스</h2>
+                    
+                </div>
+                <div class="card">
+                    <h2 class="sub-title">태초의 섬</h2>
+
+                </div>
+            </div>           
+        </div>
+    </div>
+
+
+    <div class="progress-bar" id="progressBar"></div>
+    <script>
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+    <script>
+        const navLinks = document.querySelectorAll('.toc-box a');
+        // 수정: .main-title 클래스를 가진 요소들만 타겟으로 지정
+        const sections = document.querySelectorAll('.main-title');
+    
+        window.addEventListener('scroll', () => {
+            let current = '';
+    
+            // 1. 현재 화면 위치 계산
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150; 
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+    
+            // 2. 페이지 끝 도달 시 마지막 섹션 강제 고정
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                current = sections[sections.length - 1].getAttribute('id');
+            }
+    
+            // 3. 하이라이트 적용
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (current && link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const internalLinks = document.querySelectorAll('a[href^="#"]');
+    
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+    
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(decodeURIComponent(targetId));
+    
+                    if (targetElement) {
+                        // 1. 이동할 섹션 내부의 모든 이미지 수집
+                        const imgs = targetElement.querySelectorAll('.lazy-scroll-img');
+                        let loadedCount = 0;
+    
+                        // 해당 섹션에 대기 중인 이미지가 있다면
+                        if (imgs.length > 0) {
+                            imgs.forEach(img => {
+                                // 이미 이미지가 로드 완료된 상태라면 카운트 업
+                                if (img.complete) {
+                                    loadedCount++;
+                                    if (loadedCount === imgs.length) {
+                                        scrollToTarget(targetElement);
+                                    }
+                                } else {
+                                    // 로딩 중이라면 로딩이 끝나는 순간을 감지
+                                    img.addEventListener('load', () => {
+                                        loadedCount++;
+                                        if (loadedCount === imgs.length) {
+                                            scrollToTarget(targetElement); // 모든 이미지의 실제 높이가 반영된 후 이동!
+                                        }
+                                    });
+                                    img.addEventListener('error', () => { // 에러 대비
+                                        loadedCount++;
+                                        if (loadedCount === imgs.length) {
+                                            scrollToTarget(targetElement);
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            // 이미지가 없는 섹션은 즉시 이동
+                            scrollToTarget(targetElement);
+                        }
+                    }
+                });
+            });
+    
+            // 스크롤 이동 공통 함수
+            function scrollToTarget(element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                history.replaceState(null, null, ' ');
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 본문 내의 모든 대메뉴(h1)를 찾습니다.
+            const mainTitles = document.querySelectorAll('main.main-content h1.main-title');
+            
+            mainTitles.forEach(title => {
+                // 1. 타이틀과 우측 버튼을 묶어줄 wrapper(div) 생성
+                const wrapper = document.createElement('div');
+                wrapper.className = 'main-title-wrapper';
+                
+                // 2. 우측 버튼 생성 (기본 상태가 '펴기'이므로 '접기 ▲'로 시작)
+                const toggleBtn = document.createElement('div');
+                toggleBtn.className = 'toggle-layout-btn expanded-state';
+                toggleBtn.innerText = '접기 '; 
+                
+                // 3. 구조 배치 변경 (h1을 wrapper 안으로 넣고 버튼과 정렬)
+                title.parentNode.insertBefore(wrapper, title);
+                wrapper.appendChild(title);
+                wrapper.appendChild(toggleBtn);
+                
+                // 4. [수정 핵심] 해당 섹션(container) 안에서 wrapper(제목)를 제외한 
+                // 모든 자식 요소들(p, div.card, img 등)을 전부 숨김 대상으로 지정합니다.
+                const container = wrapper.parentNode;
+                
+                // 5. 버튼 클릭 시 온/오프 이벤트
+                toggleBtn.addEventListener('click', () => {
+                    const isFolded = toggleBtn.classList.contains('folded-state');
+                    
+                    // container 내부의 모든 자식 요소를 돌면서 wrapper(제목줄)만 빼고 전부 토글
+                    Array.from(container.children).forEach(child => {
+                        if (child !== wrapper) {
+                            if (isFolded) {
+                                child.classList.remove('content-folded'); // 보이기
+                            } else {
+                                child.classList.add('content-folded');    // 숨기기
+                            }
+                        }
+                    });
+                    
+                    // 버튼 상태 클래스 및 텍스트 교체
+                    if (isFolded) {
+                        toggleBtn.classList.remove('folded-state');
+                        toggleBtn.classList.add('expanded-state');
+                        toggleBtn.innerText = '접기 ';
+                    } else {
+                        toggleBtn.classList.remove('expanded-state');
+                        toggleBtn.classList.add('folded-state');
+                        toggleBtn.innerText = '펴기 ';
+                    }
+                });
+            });
+            document.getElementById('toggleAllBtn').addEventListener('click', function() {
+            const allToggleBtns = document.querySelectorAll('.toggle-layout-btn');
+            const isCurrentlyFolded = this.innerText === '전체 펴기';
+            
+            allToggleBtns.forEach(btn => {
+                // 각 섹션의 버튼이 현재 상태와 반대라면 클릭 이벤트를 강제로 발생시킴
+                const isBtnFolded = btn.classList.contains('folded-state');
+                if (isCurrentlyFolded ? isBtnFolded : !isBtnFolded) {
+                    btn.click();
+                }
+            });
+            
+            // 전체 버튼 텍스트 토글
+            this.innerText = isCurrentlyFolded ? '전체 접기' : '전체 펴기';
+        });
+        });
+    </script>
+    <!-- 조회수 기록>
+    <script>
+        // 페이지가 로드될 때마다 위에서 받은 '웹 앱 URL'을 호출
+
+        fetch('https://script.google.com/macros/s/AKfycbwSqARqOln42Iglcb_HzhlrUqcyaHrsGinaiyh-mplMjHTTGJxO-oR2znPItvYdkyV9/exec')
+        .then(response => console.log('조회수 기록 성공'))
+        .catch(error => console.error('기록 실패', error));
+    </script>
+    -->
+    <div class="fixed-bottom-ui">
+        <ul>
+            <li>
+                <button id="toggleAllBtn">전체 접기</button>
+            </li>
+            <li>
+                <button id="topBtn" onclick="window.scrollTo(0, 0);">맨 위로</button>
+            </li>
+            <li>
+                <div class="update-date">최종 수정일: 2026. 06. 25</div>
+            </li>
+        </ul>
+    </div>
+
+</body>
+
+</html>
